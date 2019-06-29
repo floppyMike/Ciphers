@@ -1,24 +1,8 @@
 // Ciphers.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-
-#include <CustomLibrary/Error.h>
-#include <CustomLibrary/utility.h>
-
-enum Flags
-{
-	VERBOSE, FILE, HEX, ALL
-};
-std::bitset<ALL> g_commandFlags;
-
-void printError();
-
-std::string resizeKey(const char* const, const size_t&);
-std::string hexToString(const char* const);
+#include "Globals.h"
+#include "Utility.h"
 
 struct Decrypt {};
 struct Encrypt {};
@@ -88,36 +72,6 @@ int main(int argc, char** argv)
 	}
 	std::cout << '\n';
 	return 0;
-}
-
-void printError()
-{
-	std::cerr << "Usage: <cipher> <direction> <text> <key>\n"
-		<< "<cipher> either \"vigenere\", \"vernam\" or \"ceasar\"\n"
-		<< "<direction> \"decrypt\" or \"encrypt\"\n"
-		<< "<text> text to operate on\n"
-		<< "<key> key for cipher\n";
-}
-
-std::string resizeKey(const char* const key, const size_t& size)
-{
-	std::string genKey;
-
-	while (genKey.size() < size)
-		genKey.append(key);
-	genKey.resize(size);
-
-	return genKey;
-}
-
-std::string hexToString(const char* const ch)
-{
-	std::string newKey;
-	newKey.reserve(::strlen(ch) >> 1);
-	for (const auto* iter = ch; *iter != '\0'; iter += 2)
-		newKey.push_back(::strtoul(std::string_view(iter, 2).data(), nullptr, 16));
-
-	return newKey;
 }
 
 auto vernam(std::string&& str, const char* const key)
