@@ -4,12 +4,14 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 #include <CustomLibrary/Error.h>
 #include <CustomLibrary/utility.h>
 
 enum Flags
 {
-	VERBOSE, FILE, HEX, ALL
+	E_VERBOSE, E_FILE, E_HEX, E_ALL
 };
-std::bitset<ALL> g_commandFlags;
+
+extern std::bitset<E_ALL> g_commandFlags;

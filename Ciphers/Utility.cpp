@@ -9,12 +9,13 @@ void printError()
 		<< "<key> key for cipher\n";
 }
 
-std::string resizeKey(const char* const key, const size_t& size)
+std::string createKey(const char* const key, const size_t& size)
 {
-	std::string genKey;
+	std::string genKey = g_commandFlags[E_HEX] ? hexToString(key) : key;
+	std::string_view beg(genKey);
 
 	while (genKey.size() < size)
-		genKey.append(key);
+		genKey.append(beg);
 	genKey.resize(size);
 
 	return genKey;
@@ -25,7 +26,10 @@ std::string hexToString(const char* const ch)
 	std::string newKey;
 	newKey.reserve(::strlen(ch) >> 1);
 	for (const auto* iter = ch; *iter != '\0'; iter += 2)
-		newKey.push_back(::strtoul(std::string_view(iter, 2).data(), nullptr, 16));
+	{
+		char str[] = { *iter, *(iter + 1), '\0' };
+		newKey.push_back(::strtol(str, nullptr, 16));
+	}
 
 	return newKey;
 }
