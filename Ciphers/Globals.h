@@ -11,7 +11,7 @@
 
 enum Flags
 {
-	E_VERBOSE, E_FILE, E_HEX, E_ALL
+	E_FILE, E_HEX, E_ALL
 };
 
 extern std::bitset<E_ALL> g_commandFlags;

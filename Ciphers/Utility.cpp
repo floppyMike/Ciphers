@@ -2,11 +2,13 @@
 
 void printError()
 {
-	std::cerr << "Usage: <cipher> <direction> <text> <key>\n"
+	std::cerr << "Usage: <cipher> <direction> <text> <key> [flags]\n"
 		<< "<cipher> either \"vigenere\", \"vernam\" or \"ceasar\"\n"
 		<< "<direction> \"decrypt\" or \"encrypt\"\n"
 		<< "<text> text to operate on\n"
-		<< "<key> key for cipher\n";
+		<< "<key> key for cipher\n"
+		<< "[flags] -f text may be a file location and output is also locatated in \"result.txt\"\n"
+		<< "	-h text, key and output are inputted and outputed as hex";
 }
 
 std::string createKey(const char* const key, const size_t& size)

@@ -12,16 +12,15 @@ struct Encrypt {};
 template<typename Type>
 std::string vigenere(std::string&&, const char* const);
 std::string vernam(std::string&&, const char* const);
+template<typename Type>
+std::string caesar(std::string&&, const char* const);
 
 int main(int argc, char** argv)
 {
 	//Check for flags
 	for (size_t i = 5; i < argc; ++i)
 
-		if (::strcmp(argv[i], "-v") == 0)
-			g_commandFlags[E_VERBOSE] = true;
-
-		else if (::strcmp(argv[i], "-f") == 0)
+		if (::strcmp(argv[i], "-f") == 0)
 			g_commandFlags[E_FILE] = true;
 
 		else if (::strcmp(argv[i], "-h") == 0)
@@ -71,20 +70,45 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
+	else if (::strcmp(argv[1], "caesar") == 0)
+
+		if (::strcmp(argv[2], "encrypt") == 0)
+			result = caesar<Encrypt>(std::move(result), argv[4]);
+		else if (::strcmp(argv[2], "decrypt") == 0)
+			result = caesar<Decrypt>(std::move(result), argv[4]);
+		else
+		{
+			printError();
+			return 1;
+		}
+
 	else
 	{
 		printError();
 		return 1;
 	}
 
-	//Handle result printing
+	//Handle flags conversion
+	std::ofstream file("result.txt", std::ios::binary | std::ios::out);
 	std::cout << "Result: ";
-	if (g_commandFlags[E_HEX])
-		for (auto& i : result)
-			std::cout << std::setw(2) << std::setfill('0') << ctl::toHexadecimal(i);
-	else
-		std::cout << result;
-	std::cout << '\n';
+	for (auto& i : result)
+	{
+		std::string buf;
+
+		if (g_commandFlags[E_HEX])
+		{
+			auto&& temp = ctl::toHexadecimal(i);
+			buf = temp.size() == 1 ? '0' + temp : std::move(temp);
+		}
+		else
+			buf = i;
+
+		if (g_commandFlags[E_FILE])
+			file << buf;
+
+		std::cout << buf;
+	}
+
 	return 0;
 }
 
@@ -115,6 +139,31 @@ std::string vigenere(std::string&& str, const char* const key)
 
 		else
 			static_assert(true, "vigenere: Wrong type.");
+
+	return str;
+}
+
+template<typename Type>
+std::string caesar(std::string&& str, const char* const key)
+{
+	const auto shift = ::strtoul(g_commandFlags[E_HEX] ? hexToString(key).c_str() : key, nullptr, 10);
+
+	for (auto iterCipher = str.begin(); iterCipher != str.end(); ++iterCipher)
+
+		if constexpr (std::is_same_v<Type, Encrypt>)
+			if (::isupper(*iterCipher))
+				*iterCipher = (*iterCipher + shift - 'A') % 26 + 'A';
+			else
+				*iterCipher = (*iterCipher + shift - 'a') % 26 + 'a';
+
+		else if constexpr (std::is_same_v<Type, Decrypt>)
+			if (::isupper(*iterCipher))
+				*iterCipher = (*iterCipher + (26 - shift) - 'A') % 26 + 'A';
+			else
+				*iterCipher = (*iterCipher + (26 - shift) - 'a') % 26 + 'a';
+
+		else
+			static_assert(true, "caesar: Wrong type.");
 
 	return str;
 }
